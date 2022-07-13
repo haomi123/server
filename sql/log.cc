@@ -2086,6 +2086,16 @@ static int binlog_rollback(handlerton *hton, THD *thd, bool all)
     /*
       we're here because cache_log was flushed in MYSQL_BIN_LOG::log_xid()
     */
+
+    if (cache_mngr->trx_cache.has_incident())
+    {
+      /*
+        If binlogging failed, trx_cache will be empty yet an incident will
+        still need to be reported.
+      */
+      error = binlog_truncate_trx_cache(thd, cache_mngr, all);
+    }
+
     cache_mngr->reset(false, true);
     DBUG_RETURN(error);
   }
@@ -5721,9 +5731,19 @@ binlog_start_consistent_snapshot(handlerton *hton, THD *thd)
   If with_annotate != NULL and
   *with_annotate = TRUE write also Annotate_rows before the table map.
 
+  If an error occurs while writing events and rollback is not possible, e.g.
+  due to the statement modifying a non-transactional table, an incident event
+  is logged.
+
   @param table             a pointer to the table.
   @param is_transactional  @c true indicates a transactional table,
                            otherwise @c false a non-transactional.
+  @param with_annotate     @c true to write an annotate event before writing
+                           the table_map event, @c false otherwise.
+  @param stmt_modified_non_trans_table
+                           @c true if this or any statement in a potential
+                           multi-statement context modified a non transactional
+                           table.
   @return
     nonzero if an error pops up when writing the table map event.
 */
@@ -7266,15 +7286,16 @@ bool MYSQL_BIN_LOG::write_incident(THD *thd)
     mysql_mutex_unlock(&LOCK_log);
   }
 
-	/*
-		 Upon writing incident event, check for thd->error() and print the
-		 relevant error message in the error log.
-	*/
+  /*
+    Upon writing incident event, check for thd->error() and print the
+    relevant error message in the error log.
+  */
   if (!error && thd->is_error())
   {
     sql_print_error("Write to binary log failed: "
-        "%s. An incident event is written to binary log "
-        "and slave will be stopped.\n",thd->get_stmt_da()->message());
+                    "%s. An incident event is written to binary log "
+                    "and slave will be stopped.\n",
+                    thd->get_stmt_da()->message());
   }
 
   DBUG_RETURN(error);

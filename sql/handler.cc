@@ -6271,6 +6271,7 @@ static int write_locked_table_maps(THD *thd)
 
     TABLE **const end_ptr= lock->table + lock->table_count;
     bool stmt_modified_non_trans_table= false;
+
     /*
       Iterate through list of tables and identify if multi statement
       transaction modifies any non transactional table. Set the
@@ -6290,6 +6291,7 @@ static int write_locked_table_maps(THD *thd)
         break;
       }
     }
+
     for (TABLE **table_ptr= lock->table ;
          table_ptr != end_ptr ;
          ++table_ptr)
