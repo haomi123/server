@@ -4294,7 +4294,7 @@ mysql_execute_command(THD *thd)
         effecting all columns in the table).
         SHOW CREATE VIEW require the SHOW_VIEW and SELECT ACLs on the table
         level.
-        NOTE: SHOW_VIEW ACL is checked when the view is created.
+        NOTE: SHOW_VIEW ACL is checked when the view is created for pre 5.0.1
       */
 
       DBUG_PRINT("debug", ("lex->only_view: %d, table: %s.%s",
@@ -7250,7 +7250,7 @@ bool check_fk_parent_table_access(THD *thd,
                  "REFERENCES",
                  thd->security_ctx->priv_user,
                  thd->security_ctx->host_or_ip,
-                 table_name.str);
+                 db_name.str, table_name.str);
 
         return true;
       }

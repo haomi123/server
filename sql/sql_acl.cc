@@ -6501,7 +6501,8 @@ int mysql_table_grant(THD *thd, TABLE_LIST *table_list,
                            table_list->grant.want_privilege);
         my_error(ER_TABLEACCESS_DENIED_ERROR, MYF(0),
                  command, thd->security_ctx->priv_user,
-                 thd->security_ctx->host_or_ip, table_list->alias.str);
+                 thd->security_ctx->host_or_ip, table_list->db.str,
+                 table_list->alias.str);
         DBUG_RETURN(-1);
       }
     }
@@ -7765,7 +7766,7 @@ err:
     my_error(ER_TABLEACCESS_DENIED_ERROR, MYF(0),
              command,
              sctx->priv_user,
-             sctx->host_or_ip,
+             sctx->host_or_ip, tl->db.str,
              tl ? tl->get_table_name() : "unknown");
   }
   DBUG_RETURN(TRUE);
@@ -8036,7 +8037,7 @@ err:
   if (using_column_privileges)
     my_error(ER_TABLEACCESS_DENIED_ERROR, MYF(0),
              command, sctx->priv_user,
-             sctx->host_or_ip, table_name);
+             sctx->host_or_ip, db_name, table_name);
   else
     my_error(ER_COLUMNACCESS_DENIED_ERROR, MYF(0),
              command,
