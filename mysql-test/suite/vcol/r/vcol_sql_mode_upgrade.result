@@ -358,13 +358,13 @@ CHECK TABLE t1 FOR UPGRADE;
 Table	Op	Msg_type	Msg_text
 test.t1	check	Warning	Function or expression '`a`' cannot be used in the GENERATED ALWAYS AS clause of `v`
 test.t1	check	Warning	Expression depends on the @@sql_mode value PAD_CHAR_TO_FULL_LENGTH
-test.t1	check	status	OK
+test.t1	check	error	Upgrade required. Please do "REPAIR TABLE `t1`" or dump/reload to fix it!
 FLUSH TABLES;
 CHECK TABLE t1 FOR UPGRADE;
 Table	Op	Msg_type	Msg_text
 test.t1	check	Warning	Function or expression '`a`' cannot be used in the GENERATED ALWAYS AS clause of `v`
 test.t1	check	Warning	Expression depends on the @@sql_mode value PAD_CHAR_TO_FULL_LENGTH
-test.t1	check	status	OK
+test.t1	check	error	Upgrade required. Please do "REPAIR TABLE `t1`" or dump/reload to fix it!
 DROP TABLE t1;
 #
 # Upgrading a Maria-10.2.26 table with a virtual column
@@ -374,11 +374,11 @@ CHECK TABLE t1 FOR UPGRADE;
 Table	Op	Msg_type	Msg_text
 test.t1	check	Warning	Function or expression '`a`' cannot be used in the GENERATED ALWAYS AS clause of `v`
 test.t1	check	Warning	Expression depends on the @@sql_mode value PAD_CHAR_TO_FULL_LENGTH
-test.t1	check	status	OK
+test.t1	check	error	Upgrade required. Please do "REPAIR TABLE `t1`" or dump/reload to fix it!
 FLUSH TABLES;
 CHECK TABLE t1 FOR UPGRADE;
 Table	Op	Msg_type	Msg_text
 test.t1	check	Warning	Function or expression '`a`' cannot be used in the GENERATED ALWAYS AS clause of `v`
 test.t1	check	Warning	Expression depends on the @@sql_mode value PAD_CHAR_TO_FULL_LENGTH
-test.t1	check	status	OK
+test.t1	check	error	Upgrade required. Please do "REPAIR TABLE `t1`" or dump/reload to fix it!
 DROP TABLE t1;

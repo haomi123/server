@@ -197,7 +197,7 @@ DROP TABLE maria100004_xxx_croatian_ci;
 # Copying mysql050614_xxx_croatian_ci.* to MYSQLD_DATADIR
 CHECK TABLE mysql050614_xxx_croatian_ci FOR UPGRADE;
 Table	Op	Msg_type	Msg_text
-test.mysql050614_xxx_croatian_ci	check	status	OK
+test.mysql050614_xxx_croatian_ci	check	error	Upgrade required. Please do "REPAIR TABLE `mysql050614_xxx_croatian_ci`" or dump/reload to fix it!
 SHOW CREATE TABLE mysql050614_xxx_croatian_ci;
 Table	Create Table
 mysql050614_xxx_croatian_ci	CREATE TABLE `mysql050614_xxx_croatian_ci` (
@@ -275,13 +275,14 @@ test.maria050313_ucs2_croatian_ci_def              Needs upgrade
 test.maria050313_utf8_croatian_ci                  Needs upgrade
 test.maria050533_xxx_croatian_ci                   Needs upgrade
 test.maria100004_xxx_croatian_ci                   Needs upgrade
-test.mysql050614_xxx_croatian_ci                   OK
+test.mysql050614_xxx_croatian_ci                   Needs upgrade
 
 Repairing tables
 test.maria050313_ucs2_croatian_ci_def              OK
 test.maria050313_utf8_croatian_ci                  OK
 test.maria050533_xxx_croatian_ci                   OK
 test.maria100004_xxx_croatian_ci                   OK
+test.mysql050614_xxx_croatian_ci                   OK
 Phase 7/7: Running 'FLUSH PRIVILEGES'
 OK
 # Running mysql_upgrade for the second time

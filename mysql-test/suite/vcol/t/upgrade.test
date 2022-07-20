@@ -6,7 +6,9 @@ copy_file std_data/vcol_autoinc.frm $datadir/test/vcol_autoinc.frm;
 copy_file std_data/vcol_autoinc.MYD $datadir/test/vcol_autoinc.MYD;
 copy_file std_data/vcol_autoinc.MYI $datadir/test/vcol_autoinc.MYI;
 check table vcol_autoinc for upgrade;
+--disable_warnings
 show create table vcol_autoinc;
+--enable_warnings
 select * from vcol_autoinc;
 insert vcol_autoinc (pk) values (1);
 select * from vcol_autoinc;

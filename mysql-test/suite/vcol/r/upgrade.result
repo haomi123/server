@@ -1,7 +1,7 @@
 check table vcol_autoinc for upgrade;
 Table	Op	Msg_type	Msg_text
 test.vcol_autoinc	check	Warning	Function or expression 'AUTO_INCREMENT' cannot be used in the GENERATED ALWAYS AS clause of `pk`
-test.vcol_autoinc	check	status	OK
+test.vcol_autoinc	check	error	Upgrade required. Please do "REPAIR TABLE `vcol_autoinc`" or dump/reload to fix it!
 show create table vcol_autoinc;
 Table	Create Table
 vcol_autoinc	CREATE TABLE `vcol_autoinc` (
@@ -18,7 +18,7 @@ pk	v3
 drop table vcol_autoinc;
 check table t1  for upgrade;
 Table	Op	Msg_type	Msg_text
-test.t1	check	status	OK
+test.t1	check	error	Upgrade required. Please do "REPAIR TABLE `t1`" or dump/reload to fix it!
 flush tables;
 show create table t1;
 Table	Create Table
