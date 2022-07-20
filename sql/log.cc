@@ -7290,13 +7290,18 @@ bool MYSQL_BIN_LOG::write_incident(THD *thd)
     Upon writing incident event, check for thd->error() and print the
     relevant error message in the error log.
   */
-  if (!error && thd->is_error())
+  if (thd->is_error())
   {
     sql_print_error("Write to binary log failed: "
                     "%s. An incident event is written to binary log "
                     "and slave will be stopped.\n",
                     thd->get_stmt_da()->message());
   }
+  if (error)
+  {
+    sql_print_error("Incident event write to the binary log file failed.");
+  }
+    
 
   DBUG_RETURN(error);
 }

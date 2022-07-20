@@ -6270,6 +6270,7 @@ static int write_locked_table_maps(THD *thd)
       continue;
 
     TABLE **const end_ptr= lock->table + lock->table_count;
+#if 0
     bool stmt_modified_non_trans_table= false;
 
     /*
@@ -6291,7 +6292,7 @@ static int write_locked_table_maps(THD *thd)
         break;
       }
     }
-
+#endif
     for (TABLE **table_ptr= lock->table ;
          table_ptr != end_ptr ;
          ++table_ptr)
@@ -6318,8 +6319,9 @@ static int write_locked_table_maps(THD *thd)
           table->file->has_transactions();
 
         int const error= thd->binlog_write_table_map(table, has_trans,
-                                                     &with_annotate,
-                                                     stmt_modified_non_trans_table);
+          &with_annotate,
+	  thd->lex->stmt_accessed_table(LEX::STMT_WRITES_NON_TRANS_TABLE));
+
         /*
           If an error occurs, it is the responsibility of the caller to
           roll back the transaction.
