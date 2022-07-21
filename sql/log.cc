@@ -2081,21 +2081,12 @@ static int binlog_rollback(handlerton *hton, THD *thd, bool all)
     error= binlog_commit_flush_stmt_cache(thd, all, cache_mngr);
   }
 
-  if (cache_mngr->trx_cache.empty())
+
+  if (!cache_mngr->trx_cache.has_incident() && cache_mngr->trx_cache.empty())
   {
     /*
       we're here because cache_log was flushed in MYSQL_BIN_LOG::log_xid()
     */
-
-    if (cache_mngr->trx_cache.has_incident())
-    {
-      /*
-        If binlogging failed, trx_cache will be empty yet an incident will
-        still need to be reported.
-      */
-      error = binlog_truncate_trx_cache(thd, cache_mngr, all);
-    }
-
     cache_mngr->reset(false, true);
     DBUG_RETURN(error);
   }
@@ -5740,16 +5731,11 @@ binlog_start_consistent_snapshot(handlerton *hton, THD *thd)
                            otherwise @c false a non-transactional.
   @param with_annotate     @c true to write an annotate event before writing
                            the table_map event, @c false otherwise.
-  @param stmt_modified_non_trans_table
-                           @c true if this or any statement in a potential
-                           multi-statement context modified a non transactional
-                           table.
   @return
     nonzero if an error pops up when writing the table map event.
 */
 int THD::binlog_write_table_map(TABLE *table, bool is_transactional,
-                                my_bool *with_annotate,
-                                bool stmt_modified_non_trans_table)
+                                my_bool *with_annotate)
 {
   int error;
   DBUG_ENTER("THD::binlog_write_table_map");
@@ -5810,7 +5796,8 @@ write_err:
     these scenarios rollback is not possible. Hence report an incident.
   */
   if (mysql_bin_log.check_write_error(this) && cache_data &&
-      stmt_modified_non_trans_table)
+      lex->stmt_accessed_table(LEX::STMT_WRITES_NON_TRANS_TABLE) &&
+      table->current_lock == F_WRLCK)
     cache_data->set_incident();
   DBUG_RETURN(error);
 }
@@ -7240,7 +7227,9 @@ bool MYSQL_BIN_LOG::write_incident(THD *thd)
   if (likely(is_open()))
   {
     prev_binlog_id= current_binlog_id;
-    if (likely(!(error= write_incident_already_locked(thd))) &&
+    if (likely(
+            !(error= DBUG_EVALUATE_IF("incident_event_write_error", 1,
+                                      write_incident_already_locked(thd)))) &&
         likely(!(error= flush_and_sync(0))))
     {
       update_binlog_end_pos();
@@ -7301,7 +7290,6 @@ bool MYSQL_BIN_LOG::write_incident(THD *thd)
   {
     sql_print_error("Incident event write to the binary log file failed.");
   }
-    
 
   DBUG_RETURN(error);
 }
